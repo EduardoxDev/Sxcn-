@@ -13,7 +13,7 @@ export function formatPercent(v: number | null | undefined): string {
 }
 
 export function inviteLink(code: string): string {
-  return `${window.location.origin}/room/${code}`;
+  return `${window.location.origin}${import.meta.env.BASE_URL}room/${code}`;
 }
 
 export function pluralPeople(n: number): string {

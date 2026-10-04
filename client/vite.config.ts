@@ -9,6 +9,7 @@ export default defineConfig(({ mode }) => {
   const serverPort = env.PORT || '3001';
 
   return {
+    base: env.VITE_BASE || '/',
     envDir: '..',
     plugins: [react(), tailwindcss()],
     resolve: {

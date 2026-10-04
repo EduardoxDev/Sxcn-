@@ -58,6 +58,7 @@ server/src/
   app.ts, config.ts      # Express, Socket.IO, configuração e headers
 shared/src/              # Contratos, schemas Zod, sanitização e códigos
 tests/                   # Domínio, integração e regressões
+.github/workflows/       # CI (lint, formato, tipos, testes) e deploy no Pages
 ```
 
 ## Sinalização e mídia
@@ -86,6 +87,7 @@ Copie `.env.example` para `.env` **na raiz**. Nunca versione credenciais. `VITE_
 | `TURN_URLS`                        | URLs do relay TURN, inclusive `turns:` se necessário                   |
 | `TURN_USERNAME`, `TURN_CREDENTIAL` | Credenciais para o relay                                               |
 | `VITE_SIGNALING_URL`               | Vazio: mesma origem; URL alternativa exige build novo e CORS           |
+| `VITE_BASE`                        | Vazio: `/`; caminho público do frontend, ex.: `/Sxcn-/`                |
 
 Sala nunca usada expira em 10 minutos; sala vazia em 5 minutos. Códigos encerrados são lembrados por uma hora. Reiniciar o processo remove as salas. Preferências ficam no navegador; token de retomada é por aba. Código é um convite: qualquer pessoa que o possuir pode tentar entrar, dentro do limite. Não há contas, senha ou aprovação de entrada.
 
@@ -96,6 +98,16 @@ Sala nunca usada expira em 10 minutos; sala vazia em 5 minutos. Códigos encerra
 3. Inicie com `NODE_ENV=production npm start` (PowerShell: `$env:NODE_ENV='production'; npm start`).
 4. Exponha o servidor por um proxy **HTTPS**, com suporte a upgrade WebSocket. Sirva frontend e signaling na mesma origem.
 5. Verifique `/api/health` e teste voz/tela em duas redes distintas.
+
+### GitHub Pages
+
+O workflow `Deploy Pages` publica somente o frontend a cada push na `main`. O Pages não executa o servidor, então o signaling precisa estar hospedado em outro serviço com HTTPS (Render, Railway, Fly.io, VPS).
+
+1. Hospede o servidor com `CORS_ORIGINS=https://<usuario>.github.io`.
+2. Em **Settings → Secrets and variables → Actions → Variables**, crie `SIGNALING_URL` com a URL pública do servidor.
+3. Em **Settings → Pages**, selecione **GitHub Actions** como origem.
+
+O caminho base (`/<repositório>/`) é definido automaticamente e `404.html` garante que links `/room/:code` abram a aplicação.
 
 `localhost` funciona para testes; HTTP com IP de rede não fornece contexto seguro para microfone/captura. Não basta enviar um convite `localhost` para outra pessoa: use a URL HTTPS publicada. TURN encaminha mídia quando conexão direta é impossível. Não há servidor TURN hospedado/configurado incluído neste repositório. Credenciais TURN fixas são disponibilizadas aos participantes; em serviço público use credenciais temporárias e quotas no provedor.
 

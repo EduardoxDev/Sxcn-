@@ -3,12 +3,13 @@ import { Dialog, DialogBody, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useUi } from '@/stores/uiStore';
 import { useCopy } from '@/hooks/useCopy';
+import { inviteLink } from '@/lib/format';
 import { notify } from '@/lib/notify';
 
 export function InviteDialog({ code }: { code: string }) {
   const open = useUi((s) => s.inviteOpen);
   const { copy, copied } = useCopy();
-  const link = `${window.location.origin}/room/${code}`;
+  const link = inviteLink(code);
   const copyValue = async (value: string, title: string) => {
     if (await copy(value)) notify.success(title);
     else notify.error('Não foi possível copiar', 'Selecione o texto e copie manualmente.');
