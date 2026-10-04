@@ -37,6 +37,16 @@ export function captureConstraints(s: ScreenSettings): MediaTrackConstraints {
   };
 }
 
+/** Cameras default to 640×480 unless asked, so the preset is requested as the ideal size. */
+export function cameraConstraints(s: ScreenSettings): MediaTrackConstraints {
+  const p = PRESETS[s.quality];
+  return {
+    width: { ideal: p.width, max: p.width },
+    height: { ideal: p.height, max: p.height },
+    frameRate: { ideal: s.fps, max: s.fps },
+  };
+}
+
 /**
  * Sender encoding for one viewer. In a mesh the sharer uploads one copy per viewer, so in
  * `auto` mode the budget shrinks as the audience grows. The browser's congestion control

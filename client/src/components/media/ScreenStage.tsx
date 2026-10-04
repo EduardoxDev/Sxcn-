@@ -9,7 +9,7 @@ import { useFullscreen } from '@/hooks/useFullscreen';
 import { useHotkeys } from '@/hooks/useHotkeys';
 import { cn } from '@/lib/cn';
 import { getSession } from '@/services/session/RoomSession';
-import { useMedia } from '@/stores/mediaStore';
+import { useMedia, type ScreenSource } from '@/stores/mediaStore';
 import { useRoom } from '@/stores/roomStore';
 import { SharingBanner } from './SharingBanner';
 import { StageEmpty } from './StageEmpty';
@@ -94,7 +94,7 @@ export function ScreenStage({ onLeave }: { onLeave: () => void }) {
   }, [isRemote, sharerId, playing, stream, timedOutFor]);
   const timedOut = isRemote && !playing && timedOutFor === sharerId;
 
-  const share = () => void getSession()?.startScreen();
+  const share = (source: ScreenSource) => void getSession()?.startScreen(source);
   useHotkeys({ f: () => (stream ? void toggleFullscreen() : undefined) });
 
   const chromeVisible = !idle || toolbarFocused || showStats;

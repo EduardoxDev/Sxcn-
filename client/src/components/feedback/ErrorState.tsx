@@ -10,6 +10,7 @@ import {
   TriangleAlert,
   UserX,
   Users,
+  VideoOff,
   WifiOff,
   type LucideIcon,
 } from 'lucide-react';
@@ -31,6 +32,9 @@ const ICONS: Record<AppErrorKind, LucideIcon> = {
   'screen-blocked': Lock,
   'screen-unsupported': MonitorX,
   'screen-timeout': Clock,
+  'screen-interrupted': MonitorX,
+  'virtual-camera-missing': VideoOff,
+  'virtual-camera-blocked': Lock,
   'browser-unsupported': Globe,
   'webrtc-failed': WifiOff,
   'signaling-failed': ServerCrash,

@@ -5,6 +5,7 @@ import type { AppErrorKind } from '@/lib/errors';
 export type MicStatus =
   'idle' | 'requesting' | 'ready' | 'denied' | 'unavailable' | 'busy' | 'error' | 'none';
 export type ScreenShareStatus = 'idle' | 'requesting' | 'sharing' | 'paused' | 'ended' | 'error';
+export type ScreenSource = 'display' | 'virtual-camera';
 export type PeerState = RTCPeerConnectionState | 'recovering';
 
 export interface PeerStats {
@@ -46,6 +47,7 @@ interface MediaState {
     stream: MediaStream | null;
     error: AppErrorKind | null;
     surface: string | null;
+    source: ScreenSource;
   };
   remote: Record<string, RemoteMedia>;
   peerStates: Record<string, PeerState>;
@@ -71,7 +73,7 @@ const omit = <T>(record: Record<string, T>, key: string): Record<string, T> => {
 
 export const useMedia = create<MediaState>()((set) => ({
   mic: { status: 'idle', muted: false, stream: null, deviceLabel: null },
-  screen: { status: 'idle', stream: null, error: null, surface: null },
+  screen: { status: 'idle', stream: null, error: null, surface: null, source: 'display' },
   remote: {},
   peerStates: {},
   speaking: {},
@@ -100,7 +102,7 @@ export const useMedia = create<MediaState>()((set) => ({
     })),
   resetSession: () =>
     set({
-      screen: { status: 'idle', stream: null, error: null, surface: null },
+      screen: { status: 'idle', stream: null, error: null, surface: null, source: 'display' },
       remote: {},
       peerStates: {},
       speaking: {},

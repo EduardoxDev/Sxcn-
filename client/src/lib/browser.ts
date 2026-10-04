@@ -2,6 +2,7 @@ export const capabilities = {
   webrtc: typeof window !== 'undefined' && typeof window.RTCPeerConnection === 'function',
   microphone: typeof navigator !== 'undefined' && Boolean(navigator.mediaDevices?.getUserMedia),
   screenShare: typeof navigator !== 'undefined' && Boolean(navigator.mediaDevices?.getDisplayMedia),
+  camera: typeof navigator !== 'undefined' && Boolean(navigator.mediaDevices?.enumerateDevices),
   /** `HTMLMediaElement.setSinkId` — output device selection (Chromium, Firefox 116+). */
   outputSelection:
     typeof HTMLMediaElement !== 'undefined' && 'setSinkId' in HTMLMediaElement.prototype,

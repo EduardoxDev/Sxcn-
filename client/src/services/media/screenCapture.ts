@@ -1,5 +1,10 @@
 import type { AppErrorKind } from '@/lib/errors';
-import { captureConstraints, contentHintFor, type ScreenSettings } from '@/lib/quality';
+import {
+  cameraConstraints,
+  captureConstraints,
+  contentHintFor,
+  type ScreenSettings,
+} from '@/lib/quality';
 
 /** The picker can stay open while the user decides; past this we give up cleanly. */
 export const PICKER_TIMEOUT_MS = 90_000;
@@ -79,8 +84,11 @@ export async function applyCaptureSettings(
   settings: ScreenSettings,
 ): Promise<void> {
   track.contentHint = contentHintFor(settings.optimization);
+  const isDisplay = 'displaySurface' in track.getSettings();
   try {
-    await track.applyConstraints(captureConstraints(settings));
+    await track.applyConstraints(
+      isDisplay ? captureConstraints(settings) : cameraConstraints(settings),
+    );
   } catch (err) {
     console.warn('[screen] applyConstraints failed', err);
   }

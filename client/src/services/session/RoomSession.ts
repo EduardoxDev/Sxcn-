@@ -3,12 +3,13 @@ import { ERROR_COPY, kindFromServerCode, SignalingError } from '@/lib/errors';
 import { notify } from '@/lib/notify';
 import { degradationFor, encodingFor, type ScreenSettings } from '@/lib/quality';
 import { roomSecrets } from '@/lib/storage';
-import { useMedia } from '@/stores/mediaStore';
+import { useMedia, type ScreenSource } from '@/stores/mediaStore';
 import { useRoom } from '@/stores/roomStore';
 import { useSettings } from '@/stores/settingsStore';
 import { useUi } from '@/stores/uiStore';
 import { microphone } from '../media/microphone';
 import { applyCaptureSettings, captureScreen } from '../media/screenCapture';
+import { captureVirtualCamera } from '../media/virtualCamera';
 import { SpeakingDetector } from '../media/SpeakingDetector';
 import { signaling } from '../signaling/SignalingClient';
 import { PeerManager } from '../webrtc/PeerManager';
@@ -16,6 +17,8 @@ import { StatsMonitor } from '../webrtc/StatsMonitor';
 
 /** After this long without signaling we stop silently retrying and ask the user. */
 const RECONNECT_WINDOW_MS = 30_000;
+/** A capture that ends this soon was stopped by the system, not by the user. */
+const CAPTURE_INTERRUPTED_MS = 3000;
 
 const screenSettings = (): ScreenSettings => {
   const s = useSettings.getState();
@@ -400,7 +403,7 @@ export class RoomSession {
 
   // ── Screen share ───────────────────────────────────────────────────────────
 
-  async startScreen(): Promise<void> {
+  async startScreen(source: ScreenSource = 'display'): Promise<void> {
     const media = useMedia.getState();
     const room = useRoom.getState();
     if (
@@ -420,9 +423,10 @@ export class RoomSession {
     }
     if (this.endedTimer !== null) window.clearTimeout(this.endedTimer);
 
-    media.setScreen({ status: 'requesting', error: null });
+    media.setScreen({ status: 'requesting', error: null, source });
     const settings = screenSettings();
-    const result = await captureScreen(settings);
+    const result =
+      source === 'display' ? await captureScreen(settings) : await captureVirtualCamera(settings);
     if (this.disposed) {
       if (result.ok) result.stream.getTracks().forEach((t) => t.stop());
       return;
@@ -432,6 +436,10 @@ export class RoomSession {
       else media.setScreen({ status: 'error', error: result.error });
       return;
     }
+
+    const startedAt = performance.now();
+    const interrupted = () =>
+      source === 'display' && performance.now() - startedAt < CAPTURE_INTERRUPTED_MS;
 
     try {
       await signaling.request('screen:start');
@@ -455,13 +463,23 @@ export class RoomSession {
     if (this.disposed || result.track.readyState === 'ended') {
       result.stream.getTracks().forEach((t) => t.stop());
       if (signaling.connected) signaling.socket.emit('screen:stop');
+      if (!this.disposed) {
+        useMedia
+          .getState()
+          .setScreen(
+            interrupted() ? { status: 'error', error: 'screen-interrupted' } : { status: 'idle' },
+          );
+      }
       return;
     }
 
     this.screen = { stream: result.stream, track: result.track };
     // The browser's own "Stop sharing" button ends the track — reflect it immediately.
     result.track.addEventListener('ended', () => {
-      if (this.screen?.track === result.track) this.stopScreen({ notifyServer: true });
+      if (this.screen?.track !== result.track) return;
+      if (!interrupted()) return this.stopScreen({ notifyServer: true });
+      this.stopScreen({ notifyServer: true, silent: true });
+      useMedia.getState().setScreen({ status: 'error', error: 'screen-interrupted' });
     });
     useMedia
       .getState()

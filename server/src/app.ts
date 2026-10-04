@@ -40,8 +40,8 @@ export function createScxnServer(config: ServerConfig): ScxnServer {
       crossOriginEmbedderPolicy: false,
     }),
   );
-  // Screen capture, mic and fullscreen are used by this origin only. Chromium also checks the
-  // camera policy when capturing an entire monitor; the app never requests the webcam.
+  // Screen capture, mic, camera and fullscreen are used by this origin only. Chromium checks the
+  // camera policy for full-monitor capture, and the OBS virtual camera is opened as a camera.
   app.use((_req, res, next) => {
     res.setHeader(
       'Permissions-Policy',

@@ -1,6 +1,6 @@
 # Scxn
 
-Salas privadas para compartilhar tela e conversar por voz. React/TypeScript no cliente, Socket.IO para sinalização e WebRTC para mídia real. Sem webcam, gravação ou armazenamento de áudio/vídeo.
+Salas privadas para compartilhar tela e conversar por voz. React/TypeScript no cliente, Socket.IO para sinalização e WebRTC para mídia real. Sem webcam (apenas a câmera virtual do OBS, como fonte de tela), gravação ou armazenamento de áudio/vídeo.
 
 ## Iniciar
 
@@ -28,6 +28,7 @@ Abra **http://localhost:3001**. No Windows, após o build, `Iniciar Scxn.cmd` ta
 - Colar código ou link na home abre preparação de áudio, com nome, seleção de microfone, nível de entrada e teste da saída.
 - Sala com sidebar recolhível (drawer abaixo de 1024px), convite, voz e uma transmissão simultânea.
 - Quem transmite pode parar, pausar, ocultar a própria prévia e alterar resolução/FPS/otimização.
+- Câmera virtual do OBS como fonte alternativa, para sistemas em que a captura do navegador falha (por exemplo, versões modificadas do Windows sem Windows.Graphics.Capture). No OBS, adicione uma fonte "Captura de tela", clique em "Iniciar câmera virtual" e use "Usar câmera virtual do OBS" na sala. Se a captura de tela terminar logo após começar, a sala sugere essa opção.
 - Quem assiste pode ajustar/preencher, ampliar/arrastar, redefinir zoom, entrar em tela cheia e consultar estatísticas.
 - Host pode remover participantes ou encerrar a sala para todos. Ao sair, o próximo participante assume.
 - `M`: microfone; `S`: compartilhar/parar; `F`: tela cheia; `P`: participantes; `Esc`: fechar dialog/tela cheia. Atalhos são ignorados em campos de texto e dialogs.
@@ -141,6 +142,6 @@ node tests/browser-smoke.mjs
 
 `TEST_URL` altera o endereço (padrão `http://127.0.0.1:5173`). `PLAYWRIGHT_MODULE` permite usar uma instalação externa de Playwright. O teste usa dois contextos Chromium isolados e **mídia sintética de teste do navegador**; a conexão WebRTC e o signaling são reais. Exercita voz, tela, pausa/retomada, troca de transmissor, refresh, recuperação de autoplay, responsividade e encerramento. Screenshots ficam em `test-artifacts/` (não versionado).
 
-O header `Permissions-Policy` libera `camera=(self)` porque o Chromium valida essa política ao capturar a tela inteira; o app nunca solicita a webcam. O teste concede acesso à rede local apenas nos contextos isolados.
+O header `Permissions-Policy` libera `camera=(self)` porque o Chromium valida essa política ao capturar a tela inteira e a câmera virtual do OBS é aberta como câmera; a webcam nunca é usada. O teste concede acesso à rede local apenas nos contextos isolados.
 
 Ainda é necessário validar permissões nativas, dispositivos físicos, redes externas/TURN e comportamento de Safari/Firefox no ambiente de publicação. O teste local não prova qualidade de transmissão entre redes diferentes. Não há gravação, webcam nem áudio da aba/sistema: o áudio transmitido é o microfone.

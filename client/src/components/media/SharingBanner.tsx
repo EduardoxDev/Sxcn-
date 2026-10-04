@@ -10,6 +10,7 @@ const SURFACE_LABEL: Record<string, string> = {
   monitor: 'Tela inteira',
   window: 'Janela',
   browser: 'Aba do navegador',
+  'virtual-camera': 'Câmera virtual',
 };
 
 interface SharingBannerProps {

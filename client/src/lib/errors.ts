@@ -13,6 +13,9 @@ export type AppErrorKind =
   | 'screen-blocked'
   | 'screen-unsupported'
   | 'screen-timeout'
+  | 'screen-interrupted'
+  | 'virtual-camera-missing'
+  | 'virtual-camera-blocked'
   | 'browser-unsupported'
   | 'webrtc-failed'
   | 'signaling-failed'
@@ -80,6 +83,21 @@ export const ERROR_COPY: Record<AppErrorKind, ErrorCopy> = {
   'screen-timeout': {
     title: 'O seletor de tela não respondeu',
     description: 'Nenhuma tela foi escolhida a tempo. Tente compartilhar novamente.',
+  },
+  'screen-interrupted': {
+    title: 'O sistema encerrou a captura',
+    description:
+      'A captura parou logo após começar. Isso acontece em algumas versões modificadas do Windows. Compartilhe pela câmera virtual do OBS.',
+  },
+  'virtual-camera-missing': {
+    title: 'Câmera virtual não encontrada',
+    description:
+      'Abra o OBS, adicione uma fonte "Captura de tela" e clique em "Iniciar câmera virtual". Depois tente novamente.',
+  },
+  'virtual-camera-blocked': {
+    title: 'Acesso à câmera bloqueado',
+    description:
+      'A câmera virtual do OBS aparece para o navegador como uma câmera. Permita o acesso à câmera no ícone de cadeado da barra de endereço.',
   },
   'browser-unsupported': {
     title: 'Navegador incompatível',

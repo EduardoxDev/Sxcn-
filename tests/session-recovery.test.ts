@@ -120,3 +120,34 @@ it('disposes immediately while the leave acknowledgement is still pending', asyn
   acknowledge(null);
   await pending;
 });
+
+it('reports a display capture that the system ends right after it starts', async () => {
+  mocks.request.mockImplementation(async (event) =>
+    event === 'room:join' ? joinResult('host') : null,
+  );
+  const listeners: Record<string, () => void> = {};
+  const track = {
+    readyState: 'live',
+    stop: vi.fn(),
+    addEventListener: vi.fn((type: string, cb: () => void) => {
+      listeners[type] = cb;
+    }),
+    getSettings: () => ({ displaySurface: 'monitor' }),
+  };
+  const stream = { getVideoTracks: () => [track], getTracks: () => [track] };
+  vi.stubGlobal('navigator', { mediaDevices: { getDisplayMedia: vi.fn(async () => stream) } });
+  const { RoomSession } = await import('../client/src/services/session/RoomSession');
+  const { useMedia } = await import('../client/src/stores/mediaStore');
+  const session = new RoomSession('HG3V-WPST', 'Host');
+  try {
+    await session.join();
+    await session.startScreen();
+    listeners.ended?.();
+    expect(useMedia.getState().screen).toMatchObject({
+      status: 'error',
+      error: 'screen-interrupted',
+    });
+  } finally {
+    session.dispose();
+  }
+});
