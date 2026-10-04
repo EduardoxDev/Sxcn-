@@ -1,0 +1,183 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/jetbrains-mono';
+
+/*
+ * Scxn design tokens.
+ * The default Tailwind palette is removed on purpose: every color in the app must come from
+ * this list, so the product stays visually coherent.
+ */
+@theme {
+  --color-*: initial;
+  --color-black: #000;
+  --color-white: #fff;
+
+  /* Surfaces */
+  --color-bg: #09090a;
+  --color-stage: #000;
+  --color-surface: #111113;
+  --color-surface-raised: #17171a;
+  --color-surface-hover: #1e1e22;
+  --color-overlay: rgb(9 9 10 / 0.72);
+
+  /* Lines */
+  --color-border: rgb(255 255 255 / 0.07);
+  --color-border-strong: rgb(255 255 255 / 0.13);
+
+  /* Text */
+  --color-fg: #f3f2ee;
+  --color-fg-secondary: #a8a7a2;
+  --color-fg-muted: #6c6b67;
+
+  /* Brand — used sparingly: primary actions, active, speaking, sharing. */
+  --color-brand: #f2c14e;
+  --color-brand-hover: #f7d06f;
+  --color-brand-muted: rgb(242 193 78 / 0.12);
+  --color-brand-fg: #171307;
+
+  /* Status */
+  --color-success: #3ecf8e;
+  --color-success-muted: rgb(62 207 142 / 0.12);
+  --color-warning: #f5a524;
+  --color-warning-muted: rgb(245 165 36 / 0.12);
+  --color-danger: #f0524f;
+  --color-danger-muted: rgb(240 82 79 / 0.12);
+
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+
+  --shadow-float: 0 12px 32px -12px rgb(0 0 0 / 0.7), 0 0 0 1px var(--color-border);
+  --shadow-pop: 0 20px 48px -16px rgb(0 0 0 / 0.8), 0 0 0 1px var(--color-border-strong);
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --animate-fade-in: fade-in 160ms var(--ease-out-soft);
+  --animate-fade-out: fade-out 120ms ease-in;
+  --animate-pop-in: pop-in 180ms var(--ease-out-soft);
+  --animate-pop-out: pop-out 120ms ease-in;
+  --animate-slide-in-left: slide-in-left 220ms var(--ease-out-soft);
+  --animate-slide-out-left: slide-out-left 160ms ease-in;
+  --animate-blink: blink 5.2s ease-in-out infinite;
+  --animate-live-pulse: live-pulse 2.4s ease-in-out infinite;
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes fade-out {
+    to {
+      opacity: 0;
+    }
+  }
+  @keyframes pop-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px) scale(0.98);
+    }
+  }
+  @keyframes pop-out {
+    to {
+      opacity: 0;
+      transform: translateY(6px) scale(0.98);
+    }
+  }
+  @keyframes slide-in-left {
+    from {
+      transform: translateX(-100%);
+    }
+  }
+  @keyframes slide-out-left {
+    to {
+      transform: translateX(-100%);
+    }
+  }
+  @keyframes blink {
+    0%,
+    90%,
+    100% {
+      transform: scaleY(1);
+    }
+    93% {
+      transform: scaleY(0.08);
+    }
+    96% {
+      transform: scaleY(1);
+    }
+  }
+  @keyframes live-pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.35;
+    }
+  }
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    background: var(--color-bg);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    font-feature-settings: 'cv11', 'ss01';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    overflow: hidden;
+  }
+  ::selection {
+    background: var(--color-brand-muted);
+    color: var(--color-fg);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
+  }
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border-strong) transparent;
+  }
+}
+
+@layer utilities {
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  /* Subtle film grain for empty states — static, no animation cost. */
+  .scxn-grain {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.035'/%3E%3C/svg%3E");
+  }
+}
+
+/* Reduced motion — OS preference or the in-app setting. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+html[data-reduced-motion='true'] *,
+html[data-reduced-motion='true'] *::before,
+html[data-reduced-motion='true'] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
