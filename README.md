@@ -60,6 +60,7 @@ server/src/
 shared/src/              # Contratos, schemas Zod, sanitização e códigos
 tests/                   # Domínio, integração e regressões
 .github/workflows/       # CI (lint, formato, tipos, testes) e deploy no Pages
+render.yaml              # Deploy do servidor e frontend no Render
 ```
 
 ## Sinalização e mídia
@@ -99,6 +100,16 @@ Sala nunca usada expira em 10 minutos; sala vazia em 5 minutos. Códigos encerra
 3. Inicie com `NODE_ENV=production npm start` (PowerShell: `$env:NODE_ENV='production'; npm start`).
 4. Exponha o servidor por um proxy **HTTPS**, com suporte a upgrade WebSocket. Sirva frontend e signaling na mesma origem.
 5. Verifique `/api/health` e teste voz/tela em duas redes distintas.
+
+### Render
+
+O `render.yaml` publica frontend e signaling juntos em um único serviço web, na mesma origem e com HTTPS.
+
+1. Em [render.com](https://render.com), entre com o GitHub e clique em **New → Blueprint**.
+2. Selecione este repositório e confirme com **Apply**. TURN é opcional: deixe as variáveis vazias ou preencha com as credenciais do seu provedor.
+3. Abra a URL gerada (`https://<serviço>.onrender.com`) e verifique `/api/health`.
+
+Cada push na `main` gera um novo deploy. No plano gratuito o serviço hiberna após 15 minutos sem acesso: a primeira visita seguinte leva cerca de um minuto e as salas existentes são perdidas.
 
 ### GitHub Pages
 
