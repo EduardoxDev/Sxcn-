@@ -33,6 +33,12 @@ function iceServers(): IceServer[] {
   return servers;
 }
 
+function cloudflareTurn(): { keyId: string; token: string } | null {
+  const keyId = process.env.CLOUDFLARE_TURN_KEY_ID?.trim();
+  const token = process.env.CLOUDFLARE_TURN_API_TOKEN?.trim();
+  return keyId && token ? { keyId, token } : null;
+}
+
 export const config = {
   port: int('PORT', 3001, 1, 65535),
   production: process.env.NODE_ENV === 'production',
@@ -48,6 +54,7 @@ export const config = {
   /** Ended codes keep answering "room ended" instead of "not found" for this long. */
   endedRoomMemoryMs: 60 * 60_000,
   iceServers: iceServers(),
+  cloudflareTurn: cloudflareTurn(),
 } as const;
 
 export type ServerConfig = typeof config;

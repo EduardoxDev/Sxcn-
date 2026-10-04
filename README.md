@@ -88,6 +88,8 @@ Copie `.env.example` para `.env` **na raiz**. Nunca versione credenciais. `VITE_
 | `STUN_URLS`                        | STUN Google/Cloudflare; lista separada por vírgula                     |
 | `TURN_URLS`                        | URLs do relay TURN, inclusive `turns:` se necessário                   |
 | `TURN_USERNAME`, `TURN_CREDENTIAL` | Credenciais para o relay                                               |
+| `CLOUDFLARE_TURN_KEY_ID`           | ID da chave TURN da Cloudflare; ativa credenciais temporárias          |
+| `CLOUDFLARE_TURN_API_TOKEN`        | Token da chave TURN da Cloudflare; nunca enviado ao navegador          |
 | `VITE_SIGNALING_URL`               | Vazio: mesma origem; URL alternativa exige build novo e CORS           |
 | `VITE_BASE`                        | Vazio: `/`; caminho público do frontend, ex.: `/Sxcn-/`                |
 
@@ -106,7 +108,7 @@ Sala nunca usada expira em 10 minutos; sala vazia em 5 minutos. Códigos encerra
 O `render.yaml` publica frontend e signaling juntos em um único serviço web, na mesma origem e com HTTPS.
 
 1. Em [render.com](https://render.com), entre com o GitHub e clique em **New → Blueprint**.
-2. Selecione este repositório e confirme com **Apply**. TURN é opcional: deixe as variáveis vazias ou preencha com as credenciais do seu provedor.
+2. Selecione este repositório e confirme com **Apply**. TURN é opcional, mas recomendado: crie uma chave em **Cloudflare → Realtime → TURN Server** e preencha `CLOUDFLARE_TURN_KEY_ID` e `CLOUDFLARE_TURN_API_TOKEN`. O servidor gera credenciais válidas por 24 horas e as renova sozinho.
 3. Abra a URL gerada (`https://<serviço>.onrender.com`) e verifique `/api/health`.
 
 Cada push na `main` gera um novo deploy. No plano gratuito o serviço hiberna após 15 minutos sem acesso: a primeira visita seguinte leva cerca de um minuto e as salas existentes são perdidas.

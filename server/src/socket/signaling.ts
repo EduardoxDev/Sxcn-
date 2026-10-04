@@ -16,6 +16,7 @@ import {
   type ServerToClientEvents,
 } from '@scxn/shared';
 import type { ServerConfig } from '../config';
+import { createIceServerProvider } from '../lib/iceServers';
 import { KeyedRateLimiter, TokenBucket } from '../lib/rateLimit';
 import type { RoomManager } from '../rooms/RoomManager';
 
@@ -54,6 +55,7 @@ export function registerSignaling(io: IO, rooms: RoomManager, config: ServerConf
   const createLimiter = new KeyedRateLimiter(6, 6 / 60); // 6 rooms/min per IP
   const joinLimiter = new KeyedRateLimiter(20, 20 / 60);
   const peekLimiter = new KeyedRateLimiter(30, 1);
+  const getIceServers = createIceServerProvider(config);
 
   // ── Domain events → broadcasts ───────────────────────────────────────────
   rooms.on('joined', ({ code, participant, socketId }) => {
@@ -102,10 +104,12 @@ export function registerSignaling(io: IO, rooms: RoomManager, config: ServerConf
       reply(ack, { ok: true, data: rooms.peek(data.code) });
     });
 
-    socket.on('room:join', (payload, ack) => {
+    socket.on('room:join', async (payload, ack) => {
       const data = parse(roomJoinSchema, payload);
       if (!data) return error(ack, 'INVALID_PAYLOAD', 'Invalid join request');
       if (!joinLimiter.take(ip)) return error(ack, 'RATE_LIMITED', 'Too many join attempts');
+      const iceServers = await getIceServers();
+      if (socket.disconnected) return;
       const res = rooms.join({ ...data, socketId: socket.id });
       if (!res.ok) return error(ack, res.code, res.message);
 
@@ -114,7 +118,7 @@ export function registerSignaling(io: IO, rooms: RoomManager, config: ServerConf
         io.sockets.sockets.get(replacedSocketId)?.disconnect(true);
       }
       void socket.join(channel(data.code));
-      reply(ack, { ok: true, data: { ...rest, iceServers: config.iceServers } });
+      reply(ack, { ok: true, data: { ...rest, iceServers } });
     });
 
     socket.on('room:leave', (ack) => {
