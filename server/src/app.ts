@@ -40,11 +40,12 @@ export function createScxnServer(config: ServerConfig): ScxnServer {
       crossOriginEmbedderPolicy: false,
     }),
   );
-  // Screen capture, mic and fullscreen are used by this origin only.
+  // Screen capture, mic and fullscreen are used by this origin only. Chromium also checks the
+  // camera policy when capturing an entire monitor; the app never requests the webcam.
   app.use((_req, res, next) => {
     res.setHeader(
       'Permissions-Policy',
-      'display-capture=(self), microphone=(self), camera=(), fullscreen=(self)',
+      'display-capture=(self), microphone=(self), camera=(self), fullscreen=(self)',
     );
     next();
   });

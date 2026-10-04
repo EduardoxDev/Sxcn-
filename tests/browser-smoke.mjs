@@ -27,24 +27,6 @@ try {
     viewport: { width: 1366, height: 768 },
     permissions: ['microphone', 'local-network-access'],
   });
-  // Chromium's fake display device internally uses its fake camera. Permit that
-  // synthetic device only in these isolated test responses, never in the server.
-  // Assert the production camera restriction before adapting the test harness.
-  for (const context of [hostContext, guestContext]) {
-    await context.route('**/*', async (route) => {
-      if (route.request().resourceType() !== 'document') return route.continue();
-      const response = await route.fetch();
-      const headers = response.headers();
-      if (headers['permissions-policy']) {
-        assert.match(headers['permissions-policy'], /camera=\(\)/);
-        headers['permissions-policy'] = headers['permissions-policy'].replace(
-          'camera=()',
-          'camera=(self)',
-        );
-      }
-      await route.fulfill({ response, headers });
-    });
-  }
   await guestContext.addInitScript(() => {
     const original = HTMLMediaElement.prototype.play;
     const blockedOnce = new WeakSet();

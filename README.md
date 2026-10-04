@@ -129,6 +129,6 @@ node tests/browser-smoke.mjs
 
 `TEST_URL` altera o endereço (padrão `http://127.0.0.1:5173`). `PLAYWRIGHT_MODULE` permite usar uma instalação externa de Playwright. O teste usa dois contextos Chromium isolados e **mídia sintética de teste do navegador**; a conexão WebRTC e o signaling são reais. Exercita voz, tela, pausa/retomada, troca de transmissor, refresh, recuperação de autoplay, responsividade e encerramento. Screenshots ficam em `test-artifacts/` (não versionado).
 
-No build de produção, o teste verifica a restrição `camera=()` e adapta esse header somente nas respostas interceptadas dos contextos de teste: o dispositivo de tela sintético do Chromium usa internamente a câmera sintética. O servidor mantém a câmera bloqueada. O teste também concede acesso à rede local apenas nesses contextos isolados.
+O header `Permissions-Policy` libera `camera=(self)` porque o Chromium valida essa política ao capturar a tela inteira; o app nunca solicita a webcam. O teste concede acesso à rede local apenas nos contextos isolados.
 
 Ainda é necessário validar permissões nativas, dispositivos físicos, redes externas/TURN e comportamento de Safari/Firefox no ambiente de publicação. O teste local não prova qualidade de transmissão entre redes diferentes. Não há gravação, webcam nem áudio da aba/sistema: o áudio transmitido é o microfone.
